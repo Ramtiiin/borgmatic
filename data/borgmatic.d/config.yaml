@@ -1,0 +1,42 @@
+location:
+    source_directories:
+        - /mnt/source
+    repositories:
+        - /mnt/borg-repository
+    one_file_system: true
+
+storage:
+#   Passphrase is set in variable $BORG_PASSPHRASE
+#   encryption_passphrase: "DoNotMissToChangeYourPassphrase"
+    compression: lz4
+    archive_name_format: 'backup-{now}'
+
+retention:
+    keep_hourly: 10
+    keep_daily: 10
+    keep_weekly: 4
+    keep_monthly: 12
+    keep_yearly: 10
+    prefix: 'backup-'
+
+consistency:
+    checks:
+        - repository
+        - archives
+    check_last: 5
+    prefix: 'backup-'
+
+hooks:
+    postgresql_databases:
+        - name: all
+          hostname: YOUR SERVER'S IP OR HOSTNAME
+          port: 5432
+          username: USERNAME
+          password: PASSWORD
+          format: tar
+    before_backup:
+        - echo "Starting a backup job."
+    after_backup:
+        - echo "Backup created."
+    on_error:
+        - echo "Error while creating a backup."
